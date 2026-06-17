@@ -1,0 +1,6 @@
+{
+  "name": "寵物認養系統",
+  "description": "一個採用繁體中文與簡潔現代化設計的寵物認養系統儀表板網頁應用，支援會員註冊登入、寵物管理、認養申請管理與個人資料設定，並整合 Firebase Firestore 進行資料管理。",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

@@ -1,0 +1,55 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net (Pillar 1)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE GLOBAL HELPERS ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    // --- COLLECTION RULES MATCHES ---
+
+    // 1. PETS Collection
+    match /pets/{petId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && incoming().name is string && incoming().name.size() <= 100;
+      allow update: if isSignedIn() && incoming().name is string && incoming().name.size() <= 100;
+      allow delete: if isSignedIn();
+    }
+
+    // 2. APPLICATIONS Collection
+    match /applications/{appId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && incoming().applicantName is string && incoming().applicantName.size() <= 100;
+      allow update: if isSignedIn() && (
+        incoming().applicantName is string && incoming().applicantName.size() <= 100
+      );
+      allow delete: if isSignedIn();
+    }
+
+    // 3. USER PROFILES Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && incoming().displayName is string && incoming().displayName.size() <= 100;
+    }
+
+    // 4. ACTIVITY LOGS Collection (Append-Only)
+    match /activity_logs/{logId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && incoming().detail.size() <= 300;
+    }
+  }
+}

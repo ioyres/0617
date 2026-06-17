@@ -1,0 +1,225 @@
+{
+  "entities": {
+    "Pet": {
+      "title": "Pet",
+      "description": "寵物基本特徵檔案與領養狀態",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一識別代碼"
+        },
+        "name": {
+          "type": "string",
+          "description": "寵物名稱"
+        },
+        "type": {
+          "type": "string",
+          "description": "動物種類"
+        },
+        "age": {
+          "type": "number",
+          "description": "年齡大小"
+        },
+        "ageUnit": {
+          "type": "string",
+          "enum": [
+            "歲",
+            "個月"
+          ]
+        },
+        "gender": {
+          "type": "string",
+          "enum": [
+            "公",
+            "母",
+            "未知"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "待認養",
+            "已認養"
+          ]
+        },
+        "description": {
+          "type": "string",
+          "description": "特徵描述"
+        },
+        "imageUrl": {
+          "type": "string",
+          "description": "照片連結網址"
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "建檔戳記"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type",
+        "age",
+        "ageUnit",
+        "gender",
+        "status",
+        "createdAt"
+      ]
+    },
+    "AdoptionApplication": {
+      "title": "AdoptionApplication",
+      "description": "會員提交的各類寵物認養審核申請書",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "唯一申請識別碼"
+        },
+        "petId": {
+          "type": "string",
+          "description": "目標寵物唯一 ID"
+        },
+        "petName": {
+          "type": "string",
+          "description": "目標寵物姓名"
+        },
+        "applicantName": {
+          "type": "string",
+          "description": "申請人姓名"
+        },
+        "contactPhone": {
+          "type": "string",
+          "description": "聯絡電話"
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "聯絡郵件地址"
+        },
+        "notes": {
+          "type": "string",
+          "description": "居處與動機說明自傳"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "審核中",
+            "已核准",
+            "已拒絕"
+          ]
+        },
+        "appliedAt": {
+          "type": "number",
+          "description": "提交時間戳記"
+        }
+      },
+      "required": [
+        "id",
+        "petId",
+        "petName",
+        "applicantName",
+        "contactPhone",
+        "contactEmail",
+        "status",
+        "appliedAt"
+      ]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "使用者的個人設定與權限等級",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "系統生成 UID"
+        },
+        "email": {
+          "type": "string",
+          "description": "電子信箱"
+        },
+        "displayName": {
+          "type": "string",
+          "description": "顯示暱稱"
+        },
+        "phone": {
+          "type": "string",
+          "description": "聯絡電話"
+        },
+        "bio": {
+          "type": "string",
+          "description": "個人自我簡介描述"
+        },
+        "role": {
+          "type": "string",
+          "enum": [
+            "管理員",
+            "一般會員"
+          ]
+        },
+        "createdAt": {
+          "type": "number",
+          "description": "帳號登記日期"
+        }
+      },
+      "required": [
+        "uid",
+        "email",
+        "displayName",
+        "role",
+        "createdAt"
+      ]
+    },
+    "ActivityLog": {
+      "title": "ActivityLog",
+      "description": "管理員及會員重要行為的操作歷史紀錄",
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "操作日誌代號"
+        },
+        "type": {
+          "type": "string",
+          "description": "行為大類"
+        },
+        "userEmail": {
+          "type": "string",
+          "description": "操作人電子郵件"
+        },
+        "detail": {
+          "type": "string",
+          "description": "操作明細"
+        },
+        "timestamp": {
+          "type": "number",
+          "description": "操作時間印記"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "userEmail",
+        "detail",
+        "timestamp"
+      ]
+    }
+  },
+  "firestore": {
+    "pets": {
+      "schema": "Pet",
+      "description": "所有刊載之寵物池"
+    },
+    "applications": {
+      "schema": "AdoptionApplication",
+      "description": "收件審核的各類領養申請書"
+    },
+    "users": {
+      "schema": "UserProfile",
+      "description": "系統註冊及參與會員檔案"
+    },
+    "activity_logs": {
+      "schema": "ActivityLog",
+      "description": "後置動態日誌軌跡"
+    }
+  }
+}

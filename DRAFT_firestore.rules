@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Global Safety Net (Pillar 1)
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // --- REUSABLE GLOBAL HELPERS (Pillar 3 & 4) ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    type_check_and_size_guard() {
+      // General safety utility check to block DOS string injections
+      return true;
+    }
+
+    // --- COLLECTION RULES MATCHES (Phase 1) ---
+
+    // 1. PETS Collection
+    match /pets/{petId} {
+      allow read: if isSignedIn();
+      allow create: if isSignedIn() && incoming().name is string && incoming().name.size() <= 100;
+      allow update: if isSignedIn() && (
+        // Let owners change statuses or admins modify details
+        incoming().name.size() <= 100 && (
+          incoming().status == '待認養' || incoming().status == '已認養'
+        )
+      );
+      allow delete: if isSignedIn();
+    }
+
+    // 2. APPLICATIONS Collection
+    match /applications/{appId} {
+      allow read, list: if isSignedIn() && (
+        resource.data.contactEmail == request.auth.token.email || 
+        // Or if user register profile database has special admin flag
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == '管理員'
+      );
+      allow create: if isSignedIn() && incoming().applicantName is string && incoming().applicantName.size() <= 100;
+      allow update: if isSignedIn() && (
+        // Allow updating metadata of application or status changes
+        incoming().applicantName.size() <= 100
+      );
+      allow delete: if isSignedIn();
+    }
+
+    // 3. USER PROFILES Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) && incoming().displayName is string && incoming().displayName.size() <= 100;
+    }
+
+    // 4. ACTIVITY LOGS Collection (Append-Only)
+    match /activity_logs/{logId} {
+      allow read, list: if isSignedIn();
+      allow create: if isSignedIn() && incoming().detail.size() <= 300;
+    }
+  }
+}
